@@ -1,4 +1,4 @@
-# README - Elegoo 2.8 Inch Touch Screen Control Code
+# Elegoo 2.8 Inch Touch Screen Control Code
 
 Questo repository contiene il codice necessario per controllare lo shield touchscreen Elegoo 2.8 pollici. Lo shield è compatibile con Arduino.
 
@@ -48,4 +48,6 @@ Nella cartella "Elegoo 2.8 Inch Touch Screen User Manual V1.00.2019.12.06" trove
 La cartella "mycode" contiene gli sketch di esempio personalizzati. Per utilizzarli, apri il file .ino corrispondente utilizzando l'IDE di Arduino. Il nome del file .ino principale dovrebbe essere identico al nome della directory genitore. Eventuali file aggiuntivi presenti nella stessa directory verranno considerati librerie di supporto.
 
 ## Nota 
-Se il caricamento del codice impiega troppo tempo probabilmente ec'è un problema con la comuncazione seriale, io ho risolto cambiando porta usb (cambiando com)
+*Se il caricamento del codice impiega troppo tempo probabilmente c'è un problema con la comuncazione seriale, io ho risolto cambiando porta usb (cambiando COM).*
+
+*Readme automaticamente generato da ChatGPT*
