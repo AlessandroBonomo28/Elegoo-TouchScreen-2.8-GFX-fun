@@ -75,7 +75,7 @@ inline void multiplyMatrixVector(const float vector[4], const float matrix[4][4]
 }
 
 
-inline void project_point(const float vector[4], float projectionMatrix[4][4] , float outvec[4]) {
+inline void project_point(const float vector[4], const float projectionMatrix[4][4] , float outvec[4]) {
   multiplyMatrixVector(vector, projectionMatrix, outvec);
   if (outvec[3] != 0) {
     outvec[0] /= outvec[3];
@@ -84,11 +84,11 @@ inline void project_point(const float vector[4], float projectionMatrix[4][4] , 
   }
 }
 
-const float zFar = 1000;
-const float zNear = 0.1;
-
-float projectionMatrix[4][4] = {
-  {1, 0, 0, 0},
+const float zFar = 3;
+const float zNear = 1;
+const float aspectRatio = 1.33; // 320/240 (h/w)
+const float projectionMatrix[4][4] = {
+  {aspectRatio, 0, 0, 0},
   {0, 1, 0, 0},
   {0, 0, (zFar + zNear) / (zNear - zFar), (2 * zFar * zNear) / (zNear - zFar)},
   {0, 0, -1, 0}
@@ -111,18 +111,23 @@ unsigned long previousTime = 0; // Tempo precedente
 float deltaTime;                // Delta time in secondi
 
 
-int windowHeight;
-int windowWidth;
+unsigned int windowHeight;
+unsigned int windowWidth;
 
-int halfWindowHeight;
-int halfWindowWidth;
+unsigned int halfWindowHeight;
+unsigned int halfWindowWidth;
 
-FrameBuffer frameBuffer(20,20);
+const unsigned int frameWidth = 24;
+const unsigned int frameHeight = 24;
+
+const unsigned int halfFrameWidth = frameWidth / 2;
+const unsigned int halfFrameHeight = frameHeight / 2;
+FrameBuffer frameBuffer(frameWidth,frameHeight);
 
 void setup(void) {
   Serial.begin(9600);
   Serial.println(F("TFT LCD test"));
-  Serial.println(frameBuffer.hello());
+  //Serial.println(frameBuffer.hello());
 #ifdef USE_Elegoo_SHIELD_PINOUT
   Serial.println(F("Using Elegoo 2.8\" TFT Arduino Shield Pinout"));
 #else
@@ -168,82 +173,60 @@ void setup(void) {
   windowWidth = tft.width();
   halfWindowHeight = windowHeight / 2;
   halfWindowWidth = windowWidth / 2;
-  projectionMatrix[0][0] = (float)windowHeight /(float)windowWidth;
   tft.fillScreen(BLACK);
 
-  tft.setTextColor(GREEN);                // Set Text Proporties
+  tft.setTextColor(WHITE);                // Set Text Proporties
   tft.setTextSize(2);
-  tft.setCursor(40, 20);
-  tft.println("Wireframe Cube"); 
+  tft.setCursor(40, windowHeight - 40);   // Set Cursor Position
+  tft.println(F("Frame buffer")); 
 }
-bool drawPoints = false;
+
 float angle = 0;
 
 float projected_points[8][3] = {};
-const float translation[3] = {0,0,25}; 
+const float translation[3] = {0,0,1.75}; 
+
+float outMatrix[4][4] = {};
+float transformated[4] = {};
+float outvec[4] = {};
 void loop(void) {
   currentTime = micros();              // Ottenere il tempo corrente in microsecondi
   deltaTime = (currentTime - previousTime) / 1000000.0; // Calcolare il delta time in secondi
   previousTime = currentTime;          // Aggiornare il tempo precedente
 
-  for( int i=0;i<8;i++){
+  for(byte i=0;i<8;i++){
     float vector[4] = {points[i][0], points[i][1], points[i][2], 1};
-    float outMatrix[4][4] = {};
-    float transformated[4] = {};
-    getRotationMatrix(angle,angle,angle,translation, outMatrix);
+    
+    getRotationMatrix(angle,0,0,translation, outMatrix);
     multiplyMatrixVector(vector, outMatrix, transformated);
-    float outvec[4] = {};
     project_point(transformated,projectionMatrix, outvec);
 
-    // map to window coordinates (-1,1) -> (0,windowWidth)
-    outvec[0] = (outvec[0] + 1) * halfWindowWidth;
-    outvec[1] = (outvec[1] + 1) * halfWindowHeight;
+    // map to window coordinates (-1,1) -> (0,deviceWidth)
+    outvec[0] = (outvec[0] + 1) * halfFrameWidth;
+    outvec[1] = (outvec[1] + 1) * halfFrameHeight;
 
     projected_points[i][0] = outvec[0];
     projected_points[i][1] = outvec[1];
     projected_points[i][2] = outvec[2];
   }
-  if(drawPoints)
-    for(int i=0; i<8;i++){
-      tft.fillCircle(projected_points[i][0], projected_points[i][1], 2, WHITE);
-    }
-  frameBuffer.drawLine(0, 0, 20, 20, RED);
-  frameBuffer.drawLine(0, 20, 20, 0, BLUE);
-  /*
   // disegna 12 linee (4 * 3 linee per ciclo)
-  for(int i=0;i<4;i++){
-    int j = (i + 1) % 4;
+  for(byte i=0;i<4;i++){
+    byte j = (i + 1) % 4;
+    // TODO problema: il colore viene passato in 16 bit ma in realta il framebuffer usa 8 bit
+    // va cambiato il tipo del parametro o va convertito nella funzione drawPixel.
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
          projected_points[j][0], projected_points[j][1], BLUE);
     frameBuffer.drawLine(projected_points[i + 4][0], projected_points[i + 4][1],
-         projected_points[j + 4][0], projected_points[j + 4][1], RED);
+         projected_points[j + 4][0], projected_points[j + 4][1], BLUE);
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[i + 4][0], projected_points[i + 4][1], GREEN);
-  }
-  */
-  frameBuffer.drawBuffer(&tft);
-  //delayMicroseconds(deltaTime);
-  //frameBuffer.resetBuffer();
-  /*
-  // redraw in black
-  for(int i=0;i<4;i++){
-    int j = (i + 1) % 4;
-    tft.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[j][0], projected_points[j][1], BLACK);
-    tft.drawLine(projected_points[i + 4][0], projected_points[i + 4][1],
-         projected_points[j + 4][0], projected_points[j + 4][1], BLACK);
-    tft.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[i + 4][0], projected_points[i + 4][1], BLACK);
+         projected_points[i + 4][0], projected_points[i + 4][1], BLUE);
   }
   
-  if(drawPoints)
-    for(int i=0; i<8;i++){
-      tft.fillCircle(projected_points[i][0], projected_points[i][1], 2, BLACK);
-    }
-    */
+  frameBuffer.drawBuffer(&tft);
+  delayMicroseconds(1000);
+  frameBuffer.resetBuffer();
   angle += PI/12 * deltaTime * 5; 
   if(angle>=2*PI){
      angle = 0;
-     //drawPoints =!drawPoints;
   }
 }

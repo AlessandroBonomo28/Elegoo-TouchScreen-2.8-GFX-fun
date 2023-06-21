@@ -12,7 +12,7 @@ public:
   void drawBuffer(Elegoo_TFTLCD *tft);
   void resetBuffer();
   char* hello();
-  uint16_t* bufferPointer;
+  uint8_t* bufferPointer;
 private:
   
 };
