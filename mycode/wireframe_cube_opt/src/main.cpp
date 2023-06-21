@@ -86,7 +86,7 @@ inline void project_point(const float vector[4], const float projectionMatrix[4]
 
 const float zFar = 3;
 const float zNear = 1;
-const float aspectRatio = 1.33; // 320/240 (h/w)
+const float aspectRatio = 1.33 * 0.5; // 320/240 (h/w schermo * h/w frame)
 const float projectionMatrix[4][4] = {
   {aspectRatio, 0, 0, 0},
   {0, 1, 0, 0},
@@ -117,7 +117,7 @@ unsigned int windowWidth;
 unsigned int halfWindowHeight;
 unsigned int halfWindowWidth;
 
-const unsigned int frameWidth = 24;
+const unsigned int frameWidth = 48;
 const unsigned int frameHeight = 24;
 
 const unsigned int halfFrameWidth = frameWidth / 2;
@@ -127,14 +127,13 @@ FrameBuffer frameBuffer(frameWidth,frameHeight);
 void setup(void) {
   Serial.begin(9600);
   Serial.println(F("TFT LCD test"));
-  //Serial.println(frameBuffer.hello());
 #ifdef USE_Elegoo_SHIELD_PINOUT
   Serial.println(F("Using Elegoo 2.8\" TFT Arduino Shield Pinout"));
 #else
   Serial.println(F("Using Elegoo 2.8\" TFT Breakout Board Pinout"));
 #endif
 
-  Serial.print("TFT size is "); Serial.print(tft.width()); Serial.print("x"); Serial.println(tft.height());
+  Serial.print(F("TFT size is ")); Serial.print(tft.width()); Serial.print(F("x")); Serial.println(tft.height());
   tft.reset();
 
   uint16_t identifier = tft.readID();
@@ -175,10 +174,14 @@ void setup(void) {
   halfWindowWidth = windowWidth / 2;
   tft.fillScreen(BLACK);
 
-  tft.setTextColor(WHITE);                // Set Text Proporties
+  tft.setTextColor(WHITE);               
   tft.setTextSize(2);
-  tft.setCursor(40, windowHeight - 40);   // Set Cursor Position
+  tft.setCursor(40, windowHeight - 40);   
   tft.println(F("Frame buffer")); 
+  tft.setTextColor(BLUE); 
+  tft.setTextSize(5);
+  tft.setCursor(20, halfWindowHeight-20);   
+  tft.println(F("Fast 3D render")); 
 }
 
 float angle = 0;
@@ -215,11 +218,11 @@ void loop(void) {
     // TODO problema: il colore viene passato in 16 bit ma in realta il framebuffer usa 8 bit
     // va cambiato il tipo del parametro o va convertito nella funzione drawPixel.
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[j][0], projected_points[j][1], BLUE);
+         projected_points[j][0], projected_points[j][1], 255);
     frameBuffer.drawLine(projected_points[i + 4][0], projected_points[i + 4][1],
-         projected_points[j + 4][0], projected_points[j + 4][1], BLUE);
+         projected_points[j + 4][0], projected_points[j + 4][1], 255);
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[i + 4][0], projected_points[i + 4][1], BLUE);
+         projected_points[i + 4][0], projected_points[i + 4][1], 255);
   }
   
   frameBuffer.drawBuffer(&tft);

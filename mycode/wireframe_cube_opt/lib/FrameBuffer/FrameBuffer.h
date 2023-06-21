@@ -11,8 +11,7 @@ public:
   void drawPixel(int16_t x, int16_t y, uint16_t color) override;
   void drawBuffer(Elegoo_TFTLCD *tft);
   void resetBuffer();
-  char* hello();
-  uint8_t* bufferPointer;
+  byte* bufferPointer;
 private:
   
 };
