@@ -66,9 +66,9 @@ void getRotationMatrix(float yaw, float pitch, float roll, float outMatrix[4][4]
 
 
 inline void multiplyMatrixVector(const float vector[4], const float matrix[4][4], float outvec[4]) {
-  for (int i = 0; i < 4; i++) {
+  for (byte i = 0; i < 4; i++) {
     outvec[i] = 0;
-    for (int j = 0; j < 4; j++) {
+    for (byte j = 0; j < 4; j++) {
       outvec[i] += vector[j] * matrix[j][i];
     }
   }
