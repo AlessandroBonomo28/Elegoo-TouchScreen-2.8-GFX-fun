@@ -74,9 +74,26 @@ inline void multiplyMatrixVector(const float vector[4], const float matrix[4][4]
   }
 }
 
+const float zFar = 3;
+const float zNear = 1;
+const float aspectRatio = 1.33 * 0.5; // 320/240 (h/w schermo * h/w frame)
 
-inline void project_point(const float vector[4], const float projectionMatrix[4][4] , float outvec[4]) {
-  multiplyMatrixVector(vector, projectionMatrix, outvec);
+const float PROGMEM projectionMatrix[4][4] = {
+  {aspectRatio, 0, 0, 0},
+  {0, 1, 0, 0},
+  {0, 0, (zFar + zNear) / (zNear - zFar), (2 * zFar * zNear) / (zNear - zFar)},
+  {0, 0, -1, 0}
+};
+
+
+inline void project_point(const float vector[4], float outvec[4]) {
+  // fast multiply matrix vector
+  for (byte i = 0; i < 4; i++) {
+    outvec[i] = 0;
+    for (byte j = 0; j < 4; j++) {
+      outvec[i] += vector[j] *  pgm_read_float_near(&projectionMatrix[j][i]);
+    }
+  }
   if (outvec[3] != 0) {
     outvec[0] /= outvec[3];
     outvec[1] /= outvec[3];
@@ -84,17 +101,10 @@ inline void project_point(const float vector[4], const float projectionMatrix[4]
   }
 }
 
-const float zFar = 3;
-const float zNear = 1;
-const float aspectRatio = 1.33 * 0.5; // 320/240 (h/w schermo * h/w frame)
-const float projectionMatrix[4][4] = {
-  {aspectRatio, 0, 0, 0},
-  {0, 1, 0, 0},
-  {0, 0, (zFar + zNear) / (zNear - zFar), (2 * zFar * zNear) / (zNear - zFar)},
-  {0, 0, -1, 0}
-};
 
-const float points[8][3] = {
+
+
+const float PROGMEM points[8][3] = {
     {-1, -1, -1}, // P1
     {1, -1, -1},  // P2
     {1, 1, -1},   // P3
@@ -117,11 +127,12 @@ unsigned int windowWidth;
 unsigned int halfWindowHeight;
 unsigned int halfWindowWidth;
 
-const unsigned int frameWidth = 48;
-const unsigned int frameHeight = 24;
+const unsigned int frameWidth = 52;
+const unsigned int frameHeight = 26;
 
 const unsigned int halfFrameWidth = frameWidth / 2;
 const unsigned int halfFrameHeight = frameHeight / 2;
+
 FrameBuffer frameBuffer(frameWidth,frameHeight);
 
 void setup(void) {
@@ -188,7 +199,7 @@ float angle = 0;
 
 float projected_points[8][3] = {};
 const float translation[3] = {0,0,1.75}; 
-
+byte mode = 0;
 float outMatrix[4][4] = {};
 float transformated[4] = {};
 float outvec[4] = {};
@@ -196,13 +207,19 @@ void loop(void) {
   currentTime = micros();              // Ottenere il tempo corrente in microsecondi
   deltaTime = (currentTime - previousTime) / 1000000.0; // Calcolare il delta time in secondi
   previousTime = currentTime;          // Aggiornare il tempo precedente
-
-  for(byte i=0;i<8;i++){
-    float vector[4] = {points[i][0], points[i][1], points[i][2], 1};
-    
+  if(mode == 0 || mode == 3)
     getRotationMatrix(angle,0,0,translation, outMatrix);
+  if(mode == 2)
+    getRotationMatrix(0,angle,0,translation, outMatrix);
+  if(mode == 1)
+    getRotationMatrix(0,0,angle,translation, outMatrix);
+  
+  for(byte i=0;i<8;i++){
+    float vector[4] = {pgm_read_float_near(&points[i][0]), 
+                       pgm_read_float_near(&points[i][1]), 
+                       pgm_read_float_near(&points[i][2]), 1};
     multiplyMatrixVector(vector, outMatrix, transformated);
-    project_point(transformated,projectionMatrix, outvec);
+    project_point(transformated, outvec);
 
     // map to window coordinates (-1,1) -> (0,deviceWidth)
     outvec[0] = (outvec[0] + 1) * halfFrameWidth;
@@ -224,12 +241,20 @@ void loop(void) {
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
          projected_points[i + 4][0], projected_points[i + 4][1], 255);
   }
-  
-  frameBuffer.drawBuffer(&tft);
-  delayMicroseconds(1000);
+  if(mode == 0)
+    frameBuffer.drawBuffer(&tft,5);
+  if(mode == 1)
+    frameBuffer.drawBuffer(&tft,5,5);
+  if(mode == 2 || mode == 3)
+    frameBuffer.drawBufferUsingFastLines(&tft,5);
+  //delayMicroseconds(1000);
   frameBuffer.resetBuffer();
-  angle += PI/12 * deltaTime * 5; 
+  angle += PI/18; 
   if(angle>=2*PI){
      angle = 0;
+     mode++;
+     if(mode>3)
+      mode = 0;
+    tft.fillRect(0, 0, windowWidth,halfWindowHeight-50,BLACK);
   }
 }
