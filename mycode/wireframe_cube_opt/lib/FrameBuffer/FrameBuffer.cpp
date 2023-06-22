@@ -29,10 +29,15 @@ uint16_t FrameBuffer::read16bitColorFromBuffer(uint32_t index) {
   byte color8bit = bufferPointer[index];
   if (_mode == 1) {
     // RGB mode (0-255)
+    uint16_t color16bit = static_cast<uint16_t>(color8bit) << 8;
+    color16bit |= color8bit;
+    /*
     uint16_t red16bit = (color8bit & 0xE0) << 8;
     uint16_t green16bit = (color8bit & 0x1C) << 6;
     uint16_t blue16bit = (color8bit & 0x03) << 3;
     return red16bit | green16bit | blue16bit;
+    */
+    return color16bit;
   } else {
     // Grayscale mode
     return ((color8bit >> 3) << 11) | ((color8bit >> 2) << 5) | (color8bit >> 3);

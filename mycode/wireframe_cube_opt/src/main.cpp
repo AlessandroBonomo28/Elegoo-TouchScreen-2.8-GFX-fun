@@ -242,21 +242,34 @@ void loop(void) {
     frameBuffer.drawBuffer(&tft,5,5);
   if(mode == 2 || mode == 3)
     frameBuffer.drawBufferUsingFastLines(&tft,5);
+  
+  tft.setTextSize(2);
+  tft.setCursor(1,1);
+  tft.setTextColor(WHITE);
+  tft.flush();
+  tft.println(colorCount);
+  tft.flush();
+  delay(500);
+  tft.fillRect(0, 0, windowWidth,halfWindowHeight-50,BLACK);
+  
   //delayMicroseconds(1000);
   frameBuffer.resetBuffer();
   angle += PI/18; 
   colorCount+=1;
   
-  if(angle>=2*PI){
+  if(angle>=PI){
      angle = 0;
      mode++;
      if(mode>3)
       mode = 0;
-    
+    /*
     if(mode %2 == 0)
       frameBuffer.setMode8bitGrayScale();
     else 
       frameBuffer.setMode8bitColor();
-    tft.fillRect(0, 0, windowWidth,halfWindowHeight-50,BLACK);
+    
+    frameBuffer.setMode8bitColor();
+    */
   }
+  
 }
