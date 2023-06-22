@@ -116,9 +116,6 @@ const float PROGMEM points[8][3] = {
   };
 
 // ------------- GFX
-unsigned long currentTime;      // Tempo corrente
-unsigned long previousTime = 0; // Tempo precedente
-float deltaTime;                // Delta time in secondi
 
 
 unsigned int windowHeight;
@@ -196,7 +193,7 @@ void setup(void) {
 }
 
 float angle = 0;
-
+byte colorCount = 0;
 float projected_points[8][3] = {};
 const float translation[3] = {0,0,1.75}; 
 byte mode = 0;
@@ -204,9 +201,7 @@ float outMatrix[4][4] = {};
 float transformated[4] = {};
 float outvec[4] = {};
 void loop(void) {
-  currentTime = micros();              // Ottenere il tempo corrente in microsecondi
-  deltaTime = (currentTime - previousTime) / 1000000.0; // Calcolare il delta time in secondi
-  previousTime = currentTime;          // Aggiornare il tempo precedente
+
   if(mode == 0 || mode == 3)
     getRotationMatrix(angle,0,0,translation, outMatrix);
   if(mode == 2)
@@ -235,11 +230,11 @@ void loop(void) {
     // TODO problema: il colore viene passato in 16 bit ma in realta il framebuffer usa 8 bit
     // va cambiato il tipo del parametro o va convertito nella funzione drawPixel.
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[j][0], projected_points[j][1], 255);
+         projected_points[j][0], projected_points[j][1], colorCount);
     frameBuffer.drawLine(projected_points[i + 4][0], projected_points[i + 4][1],
-         projected_points[j + 4][0], projected_points[j + 4][1], 255);
+         projected_points[j + 4][0], projected_points[j + 4][1], colorCount);
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[i + 4][0], projected_points[i + 4][1], 255);
+         projected_points[i + 4][0], projected_points[i + 4][1], colorCount);
   }
   if(mode == 0)
     frameBuffer.drawBuffer(&tft,5);
@@ -250,11 +245,18 @@ void loop(void) {
   //delayMicroseconds(1000);
   frameBuffer.resetBuffer();
   angle += PI/18; 
+  colorCount+=1;
+  
   if(angle>=2*PI){
      angle = 0;
      mode++;
      if(mode>3)
       mode = 0;
+    
+    if(mode %2 == 0)
+      frameBuffer.setMode8bitGrayScale();
+    else 
+      frameBuffer.setMode8bitColor();
     tft.fillRect(0, 0, windowWidth,halfWindowHeight-50,BLACK);
   }
 }

@@ -14,8 +14,11 @@ public:
   void drawBufferUsingFastLines(Elegoo_TFTLCD *tft, int16_t scaleFactor);
   void resetBuffer();
   byte* bufferPointer;
+  void setMode8bitColor();
+  void setMode8bitGrayScale();
 private:
-  
+  uint16_t read16bitColorFromBuffer(uint32_t index);
+  byte _mode;
 };
 
 #endif 
