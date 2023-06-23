@@ -51,3 +51,18 @@ La cartella "mycode" contiene gli sketch di esempio personalizzati. Per utilizza
 *Se il caricamento del codice impiega troppo tempo probabilmente c'è un problema con la comuncazione seriale, io ho risolto cambiando porta usb (cambiando COM).*
 
 *Readme automaticamente generato da ChatGPT*
+
+## Riferimenti
+http://codeofthedamned.com/index.php/3d-projection-and-matrix-transforms
+
+https://en.wikipedia.org/wiki/Rotation_matrix
+
+https://www.makeritalia.org/tutorial/2019/06/13/ottimizzare-sram-arduino/
+
+https://en.wikipedia.org/wiki/8-bit_color
+
+formula (r,g,b)-> 16 bit: https://stackoverflow.com/questions/13720937/c-defined-16bit-high-color
+
+https://stackoverflow.com/questions/6482089/are-there-standard-8-bit-color-palettes
+
+https://www.rapidtables.com/web/color/RGB_Color.html
