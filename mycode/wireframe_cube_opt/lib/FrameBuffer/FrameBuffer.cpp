@@ -25,18 +25,13 @@ void FrameBuffer::drawPixel(int16_t x, int16_t y, uint16_t color) {
   bufferPointer[index] = color;
 }
 
-uint16_t FrameBuffer::read16bitColorFromBuffer(uint32_t index) {
+
+inline uint16_t FrameBuffer::read16bitColorFromBuffer(uint32_t index) {
   byte color8bit = bufferPointer[index];
   if (_mode == 1) {
     // RGB mode (0-255)
     uint16_t color16bit = static_cast<uint16_t>(color8bit) << 8;
     color16bit |= color8bit;
-    /*
-    uint16_t red16bit = (color8bit & 0xE0) << 8;
-    uint16_t green16bit = (color8bit & 0x1C) << 6;
-    uint16_t blue16bit = (color8bit & 0x03) << 3;
-    return red16bit | green16bit | blue16bit;
-    */
     return color16bit;
   } else {
     // Grayscale mode
@@ -44,6 +39,50 @@ uint16_t FrameBuffer::read16bitColorFromBuffer(uint32_t index) {
   }
 }
 
+void FrameBuffer::drawFastVLinesBuffer(Elegoo_TFTLCD *tft, int16_t scaleFactor) {
+  uint16_t last_color;
+  uint16_t last_x;
+  uint32_t index;
+  
+  for (int16_t x = 0; x < _width; x++) {
+    index = x;
+    last_color = read16bitColorFromBuffer(index);
+    last_x = 0;
+    
+    for (int16_t y = 0; y < _height; y++) {
+      index = y * _width + x;
+      
+      if (last_color != read16bitColorFromBuffer(index) || y == _height - 1) {
+        tft->drawFastVLine(x * scaleFactor, last_x * scaleFactor, (y - last_x + 1) * scaleFactor, last_color);
+        last_x = y + 1;
+        last_color = read16bitColorFromBuffer(index);
+      }
+    }
+  }
+}
+
+
+
+void FrameBuffer::drawFastHLinesBuffer(Elegoo_TFTLCD *tft, int16_t scaleFactor) {
+  uint16_t last_color;
+  uint16_t last_x;
+  uint32_t index;
+  for (int16_t y = 0; y < _height; y++) {
+    index = y * _width;
+    last_color = read16bitColorFromBuffer(index);
+    last_x=0;
+    for (int16_t x = 0; x < _width; x ++) {
+       index = y * _width + x ;
+      
+      if(last_color!= read16bitColorFromBuffer(index) || x == _width-1){
+        
+        tft->drawFastHLine(last_x*scaleFactor, y*scaleFactor, (x-last_x)*scaleFactor, last_color);
+        last_x = x;
+        last_color = read16bitColorFromBuffer(index);
+      }
+    }
+  }
+}
 
 void FrameBuffer::drawBuffer(Elegoo_TFTLCD *tft, int16_t scaleFactor) {
   int16_t scaledWidth = _width * scaleFactor;

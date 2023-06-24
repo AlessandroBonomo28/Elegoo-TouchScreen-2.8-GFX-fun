@@ -193,7 +193,7 @@ void setup(void) {
 }
 
 float angle = 0;
-byte colorCount = 0;
+byte count = 0;
 float projected_points[8][3] = {};
 const float translation[3] = {0,0,1.75}; 
 byte mode = 0;
@@ -227,49 +227,52 @@ void loop(void) {
   // disegna 12 linee (4 * 3 linee per ciclo)
   for(byte i=0;i<4;i++){
     byte j = (i + 1) % 4;
-    // TODO problema: il colore viene passato in 16 bit ma in realta il framebuffer usa 8 bit
-    // va cambiato il tipo del parametro o va convertito nella funzione drawPixel.
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[j][0], projected_points[j][1], colorCount);
+         projected_points[j][0], projected_points[j][1], 0xff); // 0x1a
     frameBuffer.drawLine(projected_points[i + 4][0], projected_points[i + 4][1],
-         projected_points[j + 4][0], projected_points[j + 4][1], colorCount);
+         projected_points[j + 4][0], projected_points[j + 4][1], 0xff); // 0xe1
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[i + 4][0], projected_points[i + 4][1], colorCount);
+         projected_points[i + 4][0], projected_points[i + 4][1], 0xff); // 0x46
   }
+
+  frameBuffer.drawFastVLinesBuffer(&tft,5);
+
+  /* // TODO risolvi bug che sdoppia
+  if(mode == 0 || mode == 1) frameBuffer.drawFastVLinesBuffer(&tft,5);
+  else frameBuffer.drawFastHLinesBuffer(&tft,5);
+
+  */
+  /*
   if(mode == 0)
     frameBuffer.drawBuffer(&tft,5);
   if(mode == 1)
     frameBuffer.drawBuffer(&tft,5,5);
   if(mode == 2 || mode == 3)
     frameBuffer.drawBufferUsingFastLines(&tft,5);
-  
+  */
+  /*
   tft.setTextSize(2);
   tft.setCursor(1,1);
   tft.setTextColor(WHITE);
-  tft.flush();
-  tft.println(colorCount);
-  tft.flush();
-  delay(500);
+  tft.println(count);
+  delay(250);
   tft.fillRect(0, 0, windowWidth,halfWindowHeight-50,BLACK);
-  
-  //delayMicroseconds(1000);
+  tft.flush();
+  */
   frameBuffer.resetBuffer();
   angle += PI/18; 
-  colorCount+=1;
+  count+=1;
   
   if(angle>=PI){
      angle = 0;
      mode++;
      if(mode>3)
       mode = 0;
-    /*
+    
     if(mode %2 == 0)
       frameBuffer.setMode8bitGrayScale();
     else 
       frameBuffer.setMode8bitColor();
     
-    frameBuffer.setMode8bitColor();
-    */
   }
-  
 }

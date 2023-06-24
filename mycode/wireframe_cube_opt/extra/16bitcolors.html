@@ -1,0 +1,97 @@
+
+
+<html>
+<head>
+<title>Tabella colori</title>
+<style>
+td {
+    width: 20px;
+    height: 20px;
+  }
+
+</style>
+<script>
+  // Array contenente i dati del file
+  var fileData = [
+    "00:0x0000", "01:0x0101", "02:0x0202", "03:0x0303", "04:0x0404", "05:0x0505", "06:0x0606", "07:0x0707", "08:0x0808", "09:0x0909", "0a:0x0a0a", "0b:0x0b0b", "0c:0x0c0c", "0d:0x0d0d", "0e:0x0e0e", "0f:0x0f0f", "10:0x1010", "11:0x1111", "12:0x1212",
+     "13:0x1313", "14:0x1414", "15:0x1515", "16:0x1616", "17:0x1717", "18:0x1818", "19:0x1919", "1a:0x1a1a", "1b:0x1b1b", "1c:0x1c1c", "1d:0x1d1d", "1e:0x1e1e", "1f:0x1f1f", "20:0x2020", "21:0x2121", "22:0x2222", "23:0x2323", "24:0x2424", "25:0x2525", "26:0x2626", "27:0x2727", "28:0x2828", "29:0x2929", "2a:0x2a2a", "2b:0x2b2b", "2c:0x2c2c", "2d:0x2d2d", "2e:0x2e2e", 
+     "2f:0x2f2f", "30:0x3030", "31:0x3131", "32:0x3232", "33:0x3333", "34:0x3434", "35:0x3535",
+     "36:0x3636", "37:0x3737", "38:0x3838", "39:0x3939", "3a:0x3a3a", "3b:0x3b3b", "3c:0x3c3c", "3d:0x3d3d", "3e:0x3e3e", "3f:0x3f3f", "40:0x4040", "41:0x4141", "42:0x4242", "43:0x4343", "44:0x4444", "45:0x4545", "46:0x4646", "47:0x4747", "48:0x4848", "49:0x4949", "4a:0x4a4a", "4b:0x4b4b", "4c:0x4c4c", "4d:0x4d4d", "4e:0x4e4e", "4f:0x4f4f", "50:0x5050", "51:0x5151",
+      "52:0x5252", "53:0x5353", "54:0x5454", "55:0x5555", "56:0x5656", "57:0x5757", "58:0x5858", 
+     "59:0x5959", "5a:0x5a5a", "5b:0x5b5b", "5c:0x5c5c", "5d:0x5d5d", "5e:0x5e5e", "5f:0x5f5f", "60:0x6060", "61:0x6161", "62:0x6262", "63:0x6363", "64:0x6464", "65:0x6565", "66:0x6666", "67:0x6767", "68:0x6868", "69:0x6969", "6a:0x6a6a", "6b:0x6b6b", "6c:0x6c6c", "6d:0x6d6d", "6e:0x6e6e", 
+     "6f:0x6f6f", "70:0x7070", "71:0x7171", "72:0x7272", "73:0x7373", "74:0x7474",
+      "75:0x7575", "76:0x7676", "77:0x7777", "78:0x7878", "79:0x7979", "7a:0x7a7a", "7b:0x7b7b", "7c:0x7c7c", "7d:0x7d7d", "7e:0x7e7e", "7f:0x7f7f", "80:0x8080", "81:0x8181", "82:0x8282", "83:0x8383", "84:0x8484", "85:0x8585", "86:0x8686", "87:0x8787", "88:0x8888", "89:0x8989", "8a:0x8a8a", "8b:0x8b8b", "8c:0x8c8c", "8d:0x8d8d",
+       "8e:0x8e8e", "8f:0x8f8f", "90:0x9090", "91:0x9191", "92:0x9292", "93:0x9393", "94:0x9494", "95:0x9595", "96:0x9696", "97:0x9797", "98:0x9898", "99:0x9999", "9a:0x9a9a", "9b:0x9b9b", "9c:0x9c9c", "9d:0x9d9d", "9e:0x9e9e", "9f:0x9f9f", "a0:0xa0a0", "a1:0xa1a1", "a2:0xa2a2", "a3:0xa3a3", "a4:0xa4a4", "a5:0xa5a5", "a6:0xa6a6", "a7:0xa7a7", "a8:0xa8a8", "a9:0xa9a9", "aa:0xaaaa", "ab:0xabab", "ac:0xacac", 
+       "ad:0xadad", "ae:0xaeae", "af:0xafaf", "b0:0xb0b0", "b1:0xb1b1", "b2:0xb2b2", "b3:0xb3b3", "b4:0xb4b4", "b5:0xb5b5", "b6:0xb6b6", "b7:0xb7b7", "b8:0xb8b8", "b9:0xb9b9", "ba:0xbaba",
+       "bb:0xbbbb", "bc:0xbcbc", "bd:0xbdbd", "be:0xbebe", "bf:0xbfbf", "c0:0xc0c0", "c1:0xc1c1", "c2:0xc2c2", "c3:0xc3c3", "c4:0xc4c4", "c5:0xc5c5", "c6:0xc6c6", "c7:0xc7c7", "c8:0xc8c8", "c9:0xc9c9", "ca:0xcaca", "cb:0xcbcb", "cc:0xcccc", "cd:0xcdcd", "ce:0xcece", "cf:0xcfcf", "d0:0xd0d0", "d1:0xd1d1", "d2:0xd2d2", "d3:0xd3d3", "d4:0xd4d4", "d5:0xd5d5", "d6:0xd6d6", "d7:0xd7d7", "d8:0xd8d8", "d9:0xd9d9",
+        "da:0xdada", "db:0xdbdb", "dc:0xdcdc", "dd:0xdddd", "de:0xdede", "df:0xdfdf", "e0:0xe0e0", "e1:0xe1e1", "e2:0xe2e2", "e3:0xe3e3", "e4:0xe4e4", "e5:0xe5e5", "e6:0xe6e6", "e7:0xe7e7", "e8:0xe8e8", "e9:0xe9e9", "ea:0xeaea", "eb:0xebeb", "ec:0xecec", "ed:0xeded", "ee:0xeeee", "ef:0xefef", "f0:0xf0f0", "f1:0xf1f1", "f2:0xf2f2", "f3:0xf3f3", "f4:0xf4f4", "f5:0xf5f5", "f6:0xf6f6", "f7:0xf7f7", "f8:0xf8f8", "f9:0xf9f9", "fa:0xfafa", "fb:0xfbfb", "fc:0xfcfc", "fd:0xfdfd", "fe:0xfefe", "ff:0xffff"
+  ];
+  // Funzione per convertire un valore esadecimale in formato RGB
+  function hexToRGB(hex) {
+  var r = (hex >> 11) & 0x1F;
+  var g = (hex >> 5) & 0x3F;
+  var b = hex & 0x1F;
+
+  // Normalizzazione dei valori sui 8 bit
+  r = (r * 255) / 31;
+  g = (g * 255) / 63;
+  b = (b * 255) / 31;
+
+  return "rgb(" + Math.round(r) + ", " + Math.round(g) + ", " + Math.round(b) + ")";
+}
+
+
+
+function createTable() {
+  var table = document.createElement("table");
+  var tbody = document.createElement("tbody");
+
+  function createEventListener(rowData) {
+    return function() {
+      this.textContent = rowData[1];
+    };
+  }
+
+  // Creazione delle righe e delle celle
+  for (var i = 0; i < fileData.length; i++) {
+    if (i % 20 === 0) {
+      var row = document.createElement("tr");
+    }
+
+    var rowData = fileData[i].split(":");
+    var colorCell = document.createElement("td");
+    colorCell.style.backgroundColor = "#" + rowData[0];
+    colorCell.addEventListener("mouseover", createEventListener(rowData));
+    colorCell.addEventListener("mouseout", function () {
+      this.textContent = "";
+    });
+
+    var codeCell = document.createElement("td");
+    codeCell.textContent = rowData[0];
+
+    var fullColorCell = document.createElement("td");
+    var hexValue = parseInt(rowData[1].substring(2), 16);
+    fullColorCell.style.backgroundColor = hexToRGB(hexValue);
+
+    row.appendChild(colorCell);
+    row.appendChild(codeCell);
+    row.appendChild(fullColorCell);
+
+    if ((i + 1) % 20 === 0 || i === fileData.length - 1) {
+      tbody.appendChild(row);
+    }
+  }
+
+  table.appendChild(tbody);
+  document.body.appendChild(table);
+}
+
+
+  
+
+  </script>
+</head>
+<body onload="createTable()">
+
+</body>
+</html>
