@@ -74,8 +74,8 @@ inline void multiplyMatrixVector(const float vector[4], const float matrix[4][4]
   }
 }
 
-const float zFar = 3;
-const float zNear = 1;
+const float zFar = 1000;
+const float zNear = 0.1;
 const float aspectRatio = 1.33 * 0.5; // 320/240 (h/w schermo * h/w frame)
 
 const float PROGMEM projectionMatrix[4][4] = {
@@ -184,30 +184,47 @@ void setup(void) {
 
   tft.setTextColor(WHITE);               
   tft.setTextSize(2);
-  tft.setCursor(40, windowHeight - 40);   
-  tft.println(F("Frame buffer")); 
-  tft.setTextColor(BLUE); 
-  tft.setTextSize(5);
-  tft.setCursor(20, halfWindowHeight-20);   
-  tft.println(F("Fast 3D render")); 
+  tft.setCursor(10, windowHeight - 40);   
+  tft.println(F("Frame buffer mode")); 
+  tft.setTextColor(RED); 
+  tft.setTextSize(3);
+  tft.setCursor(20, halfWindowHeight+20);   
+  tft.println(F("Fast VS slow render mode")); 
+  tft.flush(); // per evitare errori di rendering dopo le print
 }
 
 float angle = 0;
-byte count = 0;
+byte color1;
+byte color2;
+byte color3;
 float projected_points[8][3] = {};
-const float translation[3] = {0,0,1.75}; 
+const float translation[3] = {0,0,10}; 
 byte mode = 0;
 float outMatrix[4][4] = {};
 float transformated[4] = {};
 float outvec[4] = {};
-void loop(void) {
 
-  if(mode == 0 || mode == 3)
-    getRotationMatrix(angle,0,0,translation, outMatrix);
+
+void loop(void) {
+  if(mode == 1){ // slow mode
+    color1 = 128;
+    color2 = 180;
+    color3 = 240;
+    frameBuffer.setMode8bitGrayScale();
+  }
+  else{
+    color1 = 0x1a;
+    color2 = 0xe1;
+    color3 = 0x46;
+    frameBuffer.setMode8bitColor();
+  }
+
+  if(mode == 0 || 1)
+    getRotationMatrix(angle,angle,angle,translation, outMatrix);
   if(mode == 2)
-    getRotationMatrix(0,angle,0,translation, outMatrix);
-  if(mode == 1)
-    getRotationMatrix(0,0,angle,translation, outMatrix);
+    getRotationMatrix(angle,angle,0,translation, outMatrix);
+  if(mode == 3)
+    getRotationMatrix(angle,0,angle,translation, outMatrix);
   
   for(byte i=0;i<8;i++){
     float vector[4] = {pgm_read_float_near(&points[i][0]), 
@@ -228,51 +245,61 @@ void loop(void) {
   for(byte i=0;i<4;i++){
     byte j = (i + 1) % 4;
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[j][0], projected_points[j][1], 0xff); // 0x1a
+         projected_points[j][0], projected_points[j][1], color1); 
     frameBuffer.drawLine(projected_points[i + 4][0], projected_points[i + 4][1],
-         projected_points[j + 4][0], projected_points[j + 4][1], 0xff); // 0xe1
+         projected_points[j + 4][0], projected_points[j + 4][1], color2);
     frameBuffer.drawLine(projected_points[i][0], projected_points[i][1],
-         projected_points[i + 4][0], projected_points[i + 4][1], 0xff); // 0x46
+         projected_points[i + 4][0], projected_points[i + 4][1], color3);
+  }
+  
+  switch (mode)
+  {
+    case 0:
+    frameBuffer.drawBuffer(&tft,5);
+    break;
+
+    case 1:
+    frameBuffer.drawBufferSlowTecnique(&tft,5); // slow mode
+    break;
+
+    case 2:
+    frameBuffer.drawFastHLinesBuffer(&tft,5);
+    break;
+
+    case 3:
+    frameBuffer.drawFastVLinesBuffer(&tft,5);
+    break;
+    default:
+    tft.fillScreen(YELLOW);
+    break;
   }
 
-  frameBuffer.drawFastVLinesBuffer(&tft,5);
-
-  /* // TODO risolvi bug che sdoppia
-  if(mode == 0 || mode == 1) frameBuffer.drawFastVLinesBuffer(&tft,5);
-  else frameBuffer.drawFastHLinesBuffer(&tft,5);
-
-  */
-  /*
-  if(mode == 0)
-    frameBuffer.drawBuffer(&tft,5);
-  if(mode == 1)
-    frameBuffer.drawBuffer(&tft,5,5);
-  if(mode == 2 || mode == 3)
-    frameBuffer.drawBufferUsingFastLines(&tft,5);
-  */
-  /*
-  tft.setTextSize(2);
-  tft.setCursor(1,1);
-  tft.setTextColor(WHITE);
-  tft.println(count);
-  delay(250);
-  tft.fillRect(0, 0, windowWidth,halfWindowHeight-50,BLACK);
-  tft.flush();
-  */
   frameBuffer.resetBuffer();
+
+  if(angle == 0){
+    tft.flush();
+    tft.fillRect(windowWidth-15, windowHeight-40, 25, 40, BLACK);
+    tft.setTextColor(WHITE); 
+    tft.setTextSize(2);
+    tft.setCursor(windowWidth-15, windowHeight-40);  
+    tft.flush();
+    tft.print(mode);
+    tft.flush(); // TODO risolvere il print produce artefatti anche con i flush
+    
+  }
+
   angle += PI/18; 
-  count+=1;
   
-  if(angle>=PI){
+  if(angle>=2*PI){
      angle = 0;
      mode++;
      if(mode>3)
       mode = 0;
-    
-    if(mode %2 == 0)
-      frameBuffer.setMode8bitGrayScale();
-    else 
-      frameBuffer.setMode8bitColor();
-    
+
+  // prima di disegnare linee verticali o orizzontali pulisci lo schermo
+  // per evitare artefatti
+  if(mode == 3 || mode == 2) 
+    tft.fillRect(0,0,frameWidth*5,frameHeight*5, BLACK);
   }
+  
 }

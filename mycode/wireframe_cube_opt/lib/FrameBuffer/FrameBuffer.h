@@ -9,11 +9,16 @@ public:
   FrameBuffer(int16_t w, int16_t h);
   ~FrameBuffer();
   void drawPixel(int16_t x, int16_t y, uint16_t color) override;
+  
   void drawBuffer(Elegoo_TFTLCD *tft, int16_t scaleFactor);
+  void drawBuffer(Elegoo_TFTLCD *tft, int16_t scaleX, int16_t scaleY);
+
   void drawFastHLinesBuffer(Elegoo_TFTLCD *tft, int16_t scaleFactor);
   void drawFastVLinesBuffer(Elegoo_TFTLCD *tft, int16_t scaleFactor);
-  void drawBuffer(Elegoo_TFTLCD *tft, int16_t rectWidth, int16_t rectHeight);
-  void drawBufferUsingFastLines(Elegoo_TFTLCD *tft, int16_t scaleFactor);
+  
+
+  void drawBufferSlowTecnique(Elegoo_TFTLCD *tft, int16_t scaleFactor);
+  
   void resetBuffer();
   byte* bufferPointer;
   void setMode8bitColor();
