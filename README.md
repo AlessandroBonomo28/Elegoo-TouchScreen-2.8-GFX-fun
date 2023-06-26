@@ -66,3 +66,7 @@ formula (r,g,b)-> 16 bit: https://stackoverflow.com/questions/13720937/c-defined
 https://stackoverflow.com/questions/6482089/are-there-standard-8-bit-color-palettes
 
 https://www.rapidtables.com/web/color/RGB_Color.html
+
+CAMERA SPACE : https://learnopengl.com/Getting-started/Camera
+
+https://webtocom.com/demo/divisori/
