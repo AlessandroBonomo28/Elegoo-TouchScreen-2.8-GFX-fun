@@ -1,3 +1,4 @@
+
 const points = [
   [-1, -1, -1], // P1
   [1, -1, -1], // P2
@@ -8,23 +9,37 @@ const points = [
   [1, 1, 1], // P7
   [-1, 1, 1] // P8
 ];
-const zFar = 3;
-const zNear = 1;
+const widthWindow = 400;
+const heightWindow = 400;
+
+const zFar = 1000;
+const zNear = 0.1;
+
+
+const aspectRatio = heightWindow/widthWindow;
 
 let projectionMatrix = [
-  [1, 0, 0, 0],
+  [aspectRatio, 0, 0, 0],
   [0, 1, 0, 0],
   [0, 0, (zFar + zNear)/(zNear - zFar), (2*zFar*zNear)/(zNear - zFar)],
   [0, 0, -1, 0]
 ];
 
-
-let widthWindow = 400;
-let heightWindow = 400;
-
-
-
-
+function getLookAtMatrix(vUp,vRight,vDirLook,vPos){
+  let rotation = [
+    [vUp[0], vUp[1], vUp[2], 0],
+    [vRight[0], vRight[1], vRight[2], 0],
+    [vDirLook[0], vDirLook[1], vDirLook[2], 0],
+    [0, 0, 0, 1]
+  ];
+  let translation = [
+    [1, 0, 0, -vPos[0]],
+    [0, 1, 0, -vPos[1]],
+    [0, 0, 1, -vPos[2]],
+    [0, 0, 0, 1],
+  ];
+  return mat4x4(rotation,translation);
+}
 
 function getRotationMatrix(yaw, pitch, roll) {
   const cosYaw = Math.cos(yaw);
@@ -53,7 +68,7 @@ function getRotationMatrix(yaw, pitch, roll) {
       cosYaw * cosPitch,
       0
     ],
-    [0, 0, 0, 1]
+    [0, 0, 0, 1.0]
   ];
 
   return rotationMatrix;
@@ -86,20 +101,20 @@ function getRotationMatrixZ(angle){
   ];
   return rotationMatrixZ;
 }
-function perspectiveProjection(point, projectionMatrix) {
-  const [x, y, z] = point;
+function perspectiveProjection(p, projectionMatrix) {
   
-  const pointVector = [x, y, z, 1];
+  
+  const pointVector = [p[0],p[1],p[2], 1.0];
   
   // Moltiplica il vettore punto per la matrice di proiezione
   const projectedVector = multiplyMatrixVector(pointVector,projectionMatrix);
   const w = projectedVector[3];
-  let projectedPoint =  [x,y,z];
+  
   if(w!=0) {
     // Normalizza il risultato dividendo per la coordinata w proiettata
-    projectedPoint = projectedPoint.map(x => x/w);
+    return [projectedVector[0]/w,projectedVector[1]/w,projectedVector[2]/w];
   }
-  return projectedPoint;
+  return [projectedVector[0],projectedVector[1],projectedVector[2]];
 }
 
 function multiplyMatrixVector(vector,matrix) {
@@ -112,23 +127,29 @@ function multiplyMatrixVector(vector,matrix) {
       sum += matrix[i][j] * vector[j];
     }
     
-    result.push(sum);
+    result[i] = sum;
   }
-  
   return result;
 }
 
 
-
-function multiplyVectorByMatrix(vector, matrix) {
-  let result = [];
+function mat4x4(mat1, mat2) {
+  const result = [];
+  
   for (let i = 0; i < 4; i++) {
-    let sum = 0;
+    result[i] = [];
+    
     for (let j = 0; j < 4; j++) {
-      sum += vector[j] * matrix[j][i];
+      let sum = 0;
+      
+      for (let k = 0; k < 4; k++) {
+        sum += mat1[i][k] * mat2[k][j];
+      }
+      
+      result[i][j] = sum;
     }
-    result[i] = sum;
   }
+  
   return result;
 }
 
@@ -139,7 +160,6 @@ let sumAngle = 0;
 
 function setup() {
   createCanvas(400, 400);
- 
 }
 
 
@@ -152,26 +172,45 @@ function draw() {
      
     let angle = sumAngle ;
     
-    let rotated =  multiplyVectorByMatrix([...points[i],1],
+    const vUp = [0,1,0];
+    const vRight = [-1,0,0]; // reversed X perchè mi trovo meglio così
+    const vDirLook = [0,0,1];
+    const vPos = [0,0,0];
+    const viewMatrix = getLookAtMatrix(vUp,vRight,vDirLook,vPos);
+    let viewSpace = multiplyMatrixVector([...points[i],1],viewMatrix);
+    
+    let rotated =  multiplyMatrixVector(viewSpace,
                                           getRotationMatrix(angle,0,0));
-    rotated[2]+=5;// translate z 
+    
+    
+    rotated[2]+=map(mouseY, 0, height, -50, 50);// translate z 
     rotated[1]+= 0; // translate y 
-    rotated[0]+= 0; // translate x 
+    rotated[0]+= 1; // translate x 
     
     let projected = perspectiveProjection(rotated,projectionMatrix);
     // map to canvas space
     let x = map(projected[0], -1.0, 1.0, 0.0, 400.0);
     let y = map(projected[1], -1.0, 1.0, 0.0, 400.0);
-    let z = projected[2];
-    stroke('black');
-    strokeWeight(10);
-    point(x,y);
+    let z = projected[2]; // z buffer
+    
+    if(z<1){ // clip dots
+      stroke('black');
+      strokeWeight(10);
+      point(x,y);
+    }
+    
     projected_points.push([x,y,z]);
   }
   
   // Connect lines between vertices
   for (let i = 0; i < 4; i++) {
     let j = (i + 1) % 4;
+    
+    if (projected_points[i][2] >= 1 ||
+        projected_points[j][2] >= 1 ||
+        projected_points[j + 4][2] >= 1) // clip lines
+      continue;
+    
     if(i===0) stroke('blue');
     if(i===1) stroke('red');
     if(i===2) stroke('green');
