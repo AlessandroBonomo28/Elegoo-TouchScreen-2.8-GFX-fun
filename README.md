@@ -16,6 +16,8 @@ Per includere le librerie nel tuo progetto Arduino, segui i seguenti passaggi:
 
 Ricorda che il nome del file principale (main.ino) dovrebbe avere lo stesso nome della directory genitore. Tutti i file nella stessa directory del file principale (main.ino) verranno considerati librerie di supporto per il progetto.
 
+Gli altri progetti che troverai nella cartella "mycode" saranno progetti sviluppati nell'IDE **Platformio**
+
 ## Struttura del progetto
 
 La struttura del progetto è la seguente:
