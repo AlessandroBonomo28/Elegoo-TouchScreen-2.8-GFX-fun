@@ -219,13 +219,14 @@ void loop(void) {
     frameBuffer.setMode8bitColor();
   }
 
+
   if(mode == 0 || 1)
     getRotationMatrix(angle,angle,angle,translation, outMatrix);
   if(mode == 2)
     getRotationMatrix(angle,angle,0,translation, outMatrix);
   if(mode == 3)
     getRotationMatrix(angle,0,angle,translation, outMatrix);
-  
+
   for(byte i=0;i<8;i++){
     float vector[4] = {pgm_read_float_near(&points[i][0]), 
                        pgm_read_float_near(&points[i][1]), 
@@ -241,6 +242,7 @@ void loop(void) {
     projected_points[i][1] = outvec[1];
     projected_points[i][2] = outvec[2];
   }
+  
   // disegna 12 linee (4 * 3 linee per ciclo)
   for(byte i=0;i<4;i++){
     byte j = (i + 1) % 4;
@@ -255,7 +257,7 @@ void loop(void) {
   switch (mode)
   {
     case 0:
-    frameBuffer.drawBuffer(&tft,5);
+    frameBuffer.drawBuffer(&tft,5,5);
     break;
 
     case 1:
@@ -277,15 +279,12 @@ void loop(void) {
   frameBuffer.resetBuffer();
 
   if(angle == 0){
-    tft.flush();
     tft.fillRect(windowWidth-15, windowHeight-40, 25, 40, BLACK);
     tft.setTextColor(WHITE); 
     tft.setTextSize(2);
     tft.setCursor(windowWidth-15, windowHeight-40);  
+    tft.print(mode); // TODO fix artefatti dopo la print
     tft.flush();
-    tft.print(mode);
-    tft.flush(); // TODO risolvere il print produce artefatti anche con i flush
-    
   }
 
   angle += PI/18; 

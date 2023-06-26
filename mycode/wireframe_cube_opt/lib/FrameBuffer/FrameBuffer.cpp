@@ -72,7 +72,7 @@ void FrameBuffer::drawFastHLinesBuffer(Elegoo_TFTLCD *tft, int16_t scaleFactor) 
     last_color = read16bitColorFromBuffer(index);
     last_x=0;
     for (int16_t x = 0; x < _width; x ++) {
-       index = y * _width + x ;
+      index = y * _width + x ;
       
       if(last_color!= read16bitColorFromBuffer(index) || x == _width-1){
         tft->drawFastHLine(last_x*scaleFactor, y*scaleFactor, (x-last_x)*scaleFactor, last_color);
@@ -89,6 +89,35 @@ void FrameBuffer::drawBuffer(Elegoo_TFTLCD *tft, int16_t scaleFactor) {
 
 
 void FrameBuffer::drawBuffer(Elegoo_TFTLCD *tft, int16_t scaleX, int16_t scaleY) {
+  drawBufferVRects(tft, scaleX, scaleY);
+}
+
+// disegna il buffer con rettangoli verticali (usare quando si ha una colorazione verticale per maggiori prestazioni)
+void FrameBuffer::drawBufferVRects(Elegoo_TFTLCD *tft, int16_t scaleX, int16_t scaleY) {
+  uint16_t last_color;
+  uint16_t last_y;
+  uint32_t index;
+  
+  for (int16_t x = 0; x < _width; x++) {
+    index = x;
+    last_color = read16bitColorFromBuffer(index);
+    last_y = 0;
+    
+    for (int16_t y = 0; y < _height; y++) {
+      index = y * _width + x;
+      
+      if (last_color != read16bitColorFromBuffer(index) || y == _height - 1) {
+        tft->fillRect(x * scaleX, last_y * scaleY, scaleX, (y - last_y) * scaleY, last_color);
+        last_y = y;
+        last_color = read16bitColorFromBuffer(index);
+      }
+    }
+  }
+}
+
+
+// disegna il buffer con rettangoli orizzontali (usare quando si ha una colorazione orizzontale per maggiori prestazioni)
+void FrameBuffer::drawBufferHRects(Elegoo_TFTLCD *tft, int16_t scaleX, int16_t scaleY) {
   uint16_t last_color;
   uint16_t last_x;
   uint32_t index;
@@ -97,7 +126,7 @@ void FrameBuffer::drawBuffer(Elegoo_TFTLCD *tft, int16_t scaleX, int16_t scaleY)
     last_color = read16bitColorFromBuffer(index);
     last_x=0;
     for (int16_t x = 0; x < _width; x ++) {
-       index = y * _width + x ;
+      index = y * _width + x ;
       
       if(last_color!= read16bitColorFromBuffer(index) || x == _width-1){
         tft->fillRect(last_x*scaleX, y*scaleY, (x-last_x)*scaleX, scaleY, last_color);
@@ -107,13 +136,11 @@ void FrameBuffer::drawBuffer(Elegoo_TFTLCD *tft, int16_t scaleX, int16_t scaleY)
     }
   }
 }
-
 void FrameBuffer::drawBufferSlowTecnique(Elegoo_TFTLCD *tft, int16_t scaleFactor) {
   for (int16_t y = 0; y < _height; y ++) {
     for (int16_t x = 0; x < _width; x ++) {
       uint32_t index = y * _width + x;
       uint16_t color16bit = read16bitColorFromBuffer(index);
-
       tft->fillRect(x*scaleFactor, y*scaleFactor, scaleFactor, scaleFactor, color16bit);
     }
   }
