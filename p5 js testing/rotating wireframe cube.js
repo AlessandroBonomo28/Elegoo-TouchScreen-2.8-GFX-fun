@@ -24,14 +24,14 @@ const zNear = 0.1;
 const aspectRatio = heightWindow/widthWindow;
 
 // play with orientation
-const xCam = 1;
-const yCam = -1;
-const zCam = -1;
+const xDir = 1;
+const yDir = -1;
+const zDir = -1;
 let projectionMatrix = [
-  [aspectRatio*xCam, 0, 0, 0],
-  [0, yCam, 0, 0],
-  [0, 0, zCam*(zFar + zNear)/(zNear - zFar), (2*zFar*zNear)/(zNear - zFar)],
-  [0, 0, -zCam, 0]
+  [aspectRatio*xDir, 0, 0, 0],
+  [0, yDir, 0, 0],
+  [0, 0, zDir*(zFar + zNear)/(zNear - zFar), (2*zFar*zNear)/(zNear - zFar)],
+  [0, 0, -zDir, 0]
 ];
 
 
