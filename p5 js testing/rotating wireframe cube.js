@@ -1,3 +1,5 @@
+let isTextVisible = true;
+let drawDebugEnabled = true;
 
 let points = [
   [-1, -1, -1], // P1
@@ -215,15 +217,17 @@ function draw() {
   }
   
   let projected_points= [];
+  const angle = sumAngle ;
+    
+  const vRight = crossProduct(vUp,vDirLook);
+  const vPos = [0 + offset[0],
+                0 + offset[1],
+                0 + offset[2]];
+  const viewMatrix = getLookAtMatrix(vUp,vRight,vDirLook,vPos);
+  
   for(let i=0;i<points.length;i++){
      
-    const angle = sumAngle ;
     
-    const vRight = crossProduct(vUp,vDirLook);
-    const vPos = [0 + offset[0],
-                  0 + offset[1],
-                  0 + offset[2]];
-    const viewMatrix = getLookAtMatrix(vUp,vRight,vDirLook,vPos);
     
     const axis = vec3normalize([0,1,0]);
     const rotMatrix = getRotationMatrixArbitraryAxis(axis,angle);
@@ -251,24 +255,36 @@ function draw() {
       strokeWeight(10);
       point(x,y);
       
-      strokeWeight(0);
-      textSize(10);
-      textAlign(LEFT, CENTER);
-      const off = 10;
-      // Print the text
-      const _x = round(translated[0],1);
-      const _y = round(translated[1],1);
-      const _z = round(translated[2],1);
-      text("("+_x+","+_y+","+_z+")", x+off,y+off);
+      if(isTextVisible){
+        strokeWeight(0);
+        textSize(10);
+        textAlign(LEFT, CENTER);
+        const off = 10;
+        // Print the text
+        const _x = round(translated[0],1);
+        const _y = round(translated[1],1);
+        const _z = round(translated[2],1);
+        text("("+_x+","+_y+","+_z+")", x+off,y+off);
+      }
+      
     }
     
     projected_points.push([x,y,z]);
   }
+  
+  // draw debug text in left upper corner
   strokeWeight(0);
   textSize(15);
   textAlign(LEFT, CENTER);
   text("Look: ("+vDirLook.map(x=>round(x,1))+")",5,20);
-  text("Moved: ("+offset.map(x=>round(x,1))+")",5,40);
+  text("Position: ("+offset.map(x=>round(x,1))+")",5,40);
+  
+  if(drawDebugEnabled){
+    strokeWeight(2);
+    drawDebugAxis(viewMatrix);
+  }
+  
+  
   // Connect lines between vertices
   for (let i = 0; i < 4; i++) {
     let j = (i + 1) % 4;
@@ -295,23 +311,53 @@ function draw() {
 
 }
 
-
+let relativeMovement = true;
 function keyPressed() {
-  const unit = 1;
-  if (key === 'w') { // +z
-    offset[2] += unit;
-  } else if (key === 's') { // -z
-    offset[2] -= unit;
-  } else if (key === 'a') { // -x
-    offset[0] -= unit;
-  } else if (key === 'd') { // +x
-    offset[0] += unit;
+  const unit = 0.50;
+  if(!relativeMovement){
+    if (key === 'w') { // +z
+      offset[2] += unit;
+    } else if (key === 's') { // -z
+      offset[2] -= unit;
+    } else if (key === 'a') { // -x
+      offset[0] -= unit;
+    } else if (key === 'd') { // +x
+      offset[0] += unit;
+    }
+  } else {
+    const vRight = crossProduct(vUp,vDirLook);
+    if (key === 'w') {
+      offset[0] += vDirLook[0];
+      offset[1] += vDirLook[1];
+      offset[2] += vDirLook[2];
+    } else if (key === 's') { // -z
+      offset[0] -= vDirLook[0];
+      offset[1] -= vDirLook[1];
+      offset[2] -= vDirLook[2];
+    } else if(key === 'a'){
+      offset[0] -= vRight[0];
+      offset[1] -= vRight[1];
+      offset[2] -= vRight[2];
+    } else if (key === 'd') { // +x
+      offset[0] += vRight[0];
+      offset[1] += vRight[1];
+      offset[2] += vRight[2];
+    }
   }
-  else if(key === ' '){ // space +y
+  
+  if(key === ' '){ // space +y
     offset[1] +=unit;
   }
   else if(key === 'Shift'){// -y
     offset[1]-=unit;
+  }
+  else if(key === 't'){
+    isTextVisible = !isTextVisible;
+  }
+  else if(key ==='1'){
+    drawDebugEnabled = !drawDebugEnabled;
+  } else if(key === 'r'){
+    relativeMovement = !relativeMovement;
   }
 }
 
@@ -340,8 +386,55 @@ function updateLook() {
   const jaw = map(xDrag, 0, width, 0, 2*Math.PI) * speed;
   const pitch = map(yDrag, 0, height, 0, 2*Math.PI) * speed;
   vDirLook =  multiplyMatrixVector([0,0,1],
-                                          getRotationMatrix(-jaw,-pitch,0));
+                                   getRotationMatrix(-jaw,-pitch,0));
   vUp =  multiplyMatrixVector([0,1,0],
-                                          getRotationMatrix(-jaw,-pitch,0));
+                              getRotationMatrix(-jaw,-pitch,0));
   //vDirLook = [sin(jaw),0,cos(jaw)];
 }
+
+
+
+// Disegna l'asse di debug
+function drawDebugAxis(viewMatrix) {
+  const o = [0, 0, 0, 1];
+  // Calcola la posizione dell'origine nel sistema di coordinate dello schermo
+  let origin = multiplyMatrixVector(o, viewMatrix);
+  origin = perspectiveProjection(origin, projectionMatrix);
+  if (origin[2] < 1) {
+    origin = origin.map(x => map(x, -1, 1, 0, 400));
+    
+    // Disegna l'asse X
+    const xAxis = [1, 0, 0, 1];
+    let xEnd = multiplyMatrixVector(xAxis, viewMatrix);
+    xEnd = perspectiveProjection(xEnd, projectionMatrix);
+    if (xEnd[2] < 1) {
+      xEnd = xEnd.map(x => map(x, -1, 1, 0, 400));
+      stroke('red');
+      line(origin[0], origin[1], xEnd[0], xEnd[1]);
+      text("x", xEnd[0], xEnd[1]);
+    }
+
+    // Disegna l'asse Y
+    const yAxis = [0, 1, 0, 1];
+    let yEnd = multiplyMatrixVector(yAxis, viewMatrix);
+    yEnd = perspectiveProjection(yEnd, projectionMatrix);
+    if (yEnd[2] < 1) {
+      yEnd = yEnd.map(x => map(x, -1, 1, 0, 400));
+      stroke('green');
+      line(origin[0], origin[1], yEnd[0], yEnd[1]);
+      text("y", yEnd[0], yEnd[1]);
+    }
+
+    // Disegna l'asse Z
+    const zAxis = [0, 0, 1, 1];
+    let zEnd = multiplyMatrixVector(zAxis, viewMatrix);
+    zEnd = perspectiveProjection(zEnd, projectionMatrix);
+    if (zEnd[2] < 1) {
+      zEnd = zEnd.map(x => map(x, -1, 1, 0, 400));
+      stroke('blue');
+      line(origin[0], origin[1], zEnd[0], zEnd[1]);
+      text("z", zEnd[0], zEnd[1]);
+    }
+  }
+}
+
