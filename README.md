@@ -72,3 +72,11 @@ https://www.rapidtables.com/web/color/RGB_Color.html
 CAMERA SPACE : https://learnopengl.com/Getting-started/Camera
 
 https://webtocom.com/demo/divisori/
+
+Matrix has you https://judelco.github.io/opengl_tutorial/Positioning/Tut04%20The%20Matrix%20Has%20You.html
+
+look at matrix https://learnopengl.com/Getting-started/Camera
+
+cheats matrix https://www.euclideanspace.com/maths/geometry/affine/matrix4x4/index.htm
+
+avoid gimbal lock https://gamedev.stackexchange.com/questions/51410/how-to-avoid-gimbal-lock
