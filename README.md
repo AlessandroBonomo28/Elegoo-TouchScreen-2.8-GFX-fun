@@ -49,11 +49,16 @@ Nella cartella "Elegoo 2.8 Inch Touch Screen User Manual V1.00.2019.12.06" trove
 
 La cartella "mycode" contiene gli sketch di esempio personalizzati. Per utilizzarli, apri il file .ino corrispondente utilizzando l'IDE di Arduino. Il nome del file .ino principale dovrebbe essere identico al nome della directory genitore. Eventuali file aggiuntivi presenti nella stessa directory verranno considerati librerie di supporto.
 
-## Nota 
+## Note
 *Se il caricamento del codice impiega troppo tempo probabilmente c'è un problema con la comuncazione seriale, io ho risolto cambiando porta usb (cambiando COM).*
 
 *Readme automaticamente generato da ChatGPT*
 
+
+### Sistema left handed
+Con la mano sinistra: pollice verso su = Y , indice che punta di fronte a te = Z, medio indica alla tua destra=  X
+### Sistema right handed
+Con la mano destra: pollice verso su = Y , indice che punta verso di te = Z, medio indica alla tua destra = X
 ## Riferimenti
 http://codeofthedamned.com/index.php/3d-projection-and-matrix-transforms
 
