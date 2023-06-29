@@ -23,15 +23,32 @@ const zNear = 0.1;
 
 const aspectRatio = heightWindow/widthWindow;
 
-// play with orientation
+
+/* 
+*-------------------------------
+*|     Axis orientation!!!     |
+*_______________________________
+* In questo esempio se metto tutte le dir =1 mi trovo
+* con un left handed system, con origine nell'angolo in basso a sinistra.
+*
+* Visto che in p5 js l'origine 0,0 si trova 
+* nell'angolo in alto a sinistra
+* quindi devo mettere yDir = -1 (ribaltare la y)
+*
+* Nota che se sei in openGl l'origine è in basso a sinistra
+* e quindi yDir = 1, (non si ribalta la y).
+* Inoltre openGl usa un sistema right handed 
+* (asse z punta dallo schermo alla persona)
+* quindi zDir = -1;
+*/
 const xDir = 1;
-const yDir = -1;
-const zDir = -1;
+const yDir = -1; 
+const zDir = 1;
 let projectionMatrix = [
   [aspectRatio*xDir, 0, 0, 0],
   [0, yDir, 0, 0],
-  [0, 0, zDir*(zFar + zNear)/(zNear - zFar), (2*zFar*zNear)/(zNear - zFar)],
-  [0, 0, -zDir, 0]
+  [0, 0, -zDir*(zFar + zNear)/(zNear - zFar), (2*zFar*zNear)/(zNear - zFar)],
+  [0, 0, zDir, 0]
 ];
 
 
@@ -119,13 +136,14 @@ function getRotationMatrixZ(angle){
   ];
   return rotationMatrixZ;
 }
+
 function perspectiveProjection(p, projectionMatrix) {
   
   
   const pointVector = [p[0],p[1],p[2], 1.0];
   
   // Moltiplica il vettore punto per la matrice di proiezione
-  const projectedVector = multiplyMatrixVector(pointVector,projectionMatrix);
+  const projectedVector = multiplyVectorMatrix(pointVector,projectionMatrix);
   const w = projectedVector[3];
   
   if(w!=0) {
@@ -135,7 +153,7 @@ function perspectiveProjection(p, projectionMatrix) {
   return [projectedVector[0],projectedVector[1],projectedVector[2]];
 }
 
-function multiplyMatrixVector(vector,matrix) {
+function multiplyVectorMatrix(vector,matrix) {
   const result = [];
   
   for (let i = 0; i < matrix.length; i++) {
@@ -200,7 +218,7 @@ function setup() {
   createCanvas(400, 400);
   noCursor();
   
-  // normalize model vertices from -1,1 -> 0,1 (world space)
+  // normalize model vertices from -1,1 -> 0,1 (Opzionale)
   for(let i=0;i<points.length;i++){
     points[i] = points[i].map(x=>map(x,-1,1,0,1));
   }
@@ -233,7 +251,7 @@ function draw() {
     const rotMatrix = getRotationMatrixArbitraryAxis(axis,angle);
     //getRotationMatrix(0,0,angle);
     
-    const rotated =  multiplyMatrixVector([...points[i],1],
+    const rotated =  multiplyVectorMatrix([...points[i],1],
                                           rotMatrix);
     
     let translated = rotated;
@@ -241,7 +259,7 @@ function draw() {
     translated[1]+= -1.5; // translate y 
     translated[0]+= 0.5; // translate x 
     
-    let viewSpace = multiplyMatrixVector(translated,viewMatrix);
+    let viewSpace = multiplyVectorMatrix(translated,viewMatrix);
     
     
     let projected = perspectiveProjection(viewSpace,projectionMatrix);
@@ -385,9 +403,9 @@ function updateLook() {
   const speed = 0.3;
   const jaw = map(xDrag, 0, width, 0, 2*Math.PI) * speed;
   const pitch = map(yDrag, 0, height, 0, 2*Math.PI) * speed;
-  vDirLook =  multiplyMatrixVector([0,0,1],
+  vDirLook =  multiplyVectorMatrix([0,0,1],
                                    getRotationMatrix(-jaw,-pitch,0));
-  vUp =  multiplyMatrixVector([0,1,0],
+  vUp =  multiplyVectorMatrix([0,1,0],
                               getRotationMatrix(-jaw,-pitch,0));
   //vDirLook = [sin(jaw),0,cos(jaw)];
 }
@@ -398,14 +416,14 @@ function updateLook() {
 function drawDebugAxis(viewMatrix) {
   const o = [0, 0, 0, 1];
   // Calcola la posizione dell'origine nel sistema di coordinate dello schermo
-  let origin = multiplyMatrixVector(o, viewMatrix);
+  let origin = multiplyVectorMatrix(o, viewMatrix);
   origin = perspectiveProjection(origin, projectionMatrix);
   if (origin[2] < 1) {
     origin = origin.map(x => map(x, -1, 1, 0, 400));
     
     // Disegna l'asse X
     const xAxis = [1, 0, 0, 1];
-    let xEnd = multiplyMatrixVector(xAxis, viewMatrix);
+    let xEnd = multiplyVectorMatrix(xAxis, viewMatrix);
     xEnd = perspectiveProjection(xEnd, projectionMatrix);
     if (xEnd[2] < 1) {
       xEnd = xEnd.map(x => map(x, -1, 1, 0, 400));
@@ -416,7 +434,7 @@ function drawDebugAxis(viewMatrix) {
 
     // Disegna l'asse Y
     const yAxis = [0, 1, 0, 1];
-    let yEnd = multiplyMatrixVector(yAxis, viewMatrix);
+    let yEnd = multiplyVectorMatrix(yAxis, viewMatrix);
     yEnd = perspectiveProjection(yEnd, projectionMatrix);
     if (yEnd[2] < 1) {
       yEnd = yEnd.map(x => map(x, -1, 1, 0, 400));
@@ -427,7 +445,7 @@ function drawDebugAxis(viewMatrix) {
 
     // Disegna l'asse Z
     const zAxis = [0, 0, 1, 1];
-    let zEnd = multiplyMatrixVector(zAxis, viewMatrix);
+    let zEnd = multiplyVectorMatrix(zAxis, viewMatrix);
     zEnd = perspectiveProjection(zEnd, projectionMatrix);
     if (zEnd[2] < 1) {
       zEnd = zEnd.map(x => map(x, -1, 1, 0, 400));
