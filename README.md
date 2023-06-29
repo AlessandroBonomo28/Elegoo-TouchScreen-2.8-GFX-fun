@@ -87,3 +87,7 @@ cheats matrix https://www.euclideanspace.com/maths/geometry/affine/matrix4x4/ind
 avoid gimbal lock https://gamedev.stackexchange.com/questions/51410/how-to-avoid-gimbal-lock
 
 🔴🔴🔴🔴 right handed- left handed matrix difference + arbitrary axis rotation: https://butterflyofdream.wordpress.com/2016/07/05/converting-rotation-matrices-of-left-handed-coordinate-system/
+
+right handed view matrix (not used) https://www.songho.ca/opengl/gl_transform.html
+
+🔴coordinate omogenee (speigazione di w) https://www.songho.ca/math/homogeneous/homogeneous.html
