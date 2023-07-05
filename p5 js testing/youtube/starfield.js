@@ -11,7 +11,7 @@ function setup() {
     star[0] = random(-1,1);
     star[1] = random(-1,1);
     
-    star[2] = random(maxDist/4,maxDist);
+    star[2] = random(maxDist/8,maxDist);
     stars.push(star);
   }
 }
@@ -50,7 +50,7 @@ function draw() {
     
     
     fill(255)
-    const r = map(z,0,maxDist,5,0);
+    const r = map(z,maxDist/8,maxDist,5,0);
     ellipse(x,y,r,r)
   }
   
