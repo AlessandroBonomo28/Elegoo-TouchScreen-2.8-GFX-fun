@@ -33,8 +33,8 @@ function draw() {
     let translate_y = 1.5;
     let translate_z =5;
     
-    let x = points[i][0] * aspectRatio + translate_x;
-    let y = points[i][1] + translate_y * -1;
+    let x = (points[i][0]  + translate_x) * aspectRatio;
+    let y = (points[i][1] + translate_y) * -1;
     let z = points[i][2] +translate_z;
     
     let zDepth = computeDepth(z);
