@@ -1,5 +1,5 @@
 # Scripts p5 js
-Questi script permettono di fare testing grafici. p5 è una libreria molto semplice per disegnare a schermo. Necessita solo di un broser 
+Questi script permettono di fare testing grafici. p5 è una libreria molto semplice per disegnare a schermo. Necessita solo di un browser 
 (https://editor.p5js.org/)[Link per online p5 editor]
 
 ## Note 
