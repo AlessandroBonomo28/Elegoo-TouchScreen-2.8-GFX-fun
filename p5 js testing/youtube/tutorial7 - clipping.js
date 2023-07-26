@@ -307,6 +307,7 @@ function clipAgainstPlane(triToClip,planePoint,planeNormalTowardsInside) {
 
 let angleSum = 0;
 function draw() {
+  
   let projected_triangles = [];
   background(220);
   stroke('black');
@@ -347,7 +348,11 @@ function draw() {
       let matRotation = 
           getRotationMatrixArbitraryAxis(axisRotation,angleSum);
       //getRotationMatrixY(angleSum);
-
+      /*
+      mat4x4(getRotationMatrixZ(angleSum),
+          mat4x4(getRotationMatrixY(angleSum),getRotationMatrixX(angleSum)
+            ));
+      */
       let matTranslationScaleRotation = mat4x4(mat4x4(translationMatrix,scaleMatrix),matRotation);
 
 
@@ -393,11 +398,13 @@ function draw() {
         ));
       triViewSpace = [...triViewSpace,vertice[0],vertice[1],vertice[2]]
     }
+    
     // Near plane in front of camera 
     // in order to prevent ZDepth >=1 (objects go behind camera)
     const pointNearPlane = [0, 0, 0.01];
     const normalNearPlane = [0,0,1];
     let clippedTriangles = clipAgainstPlane(triViewSpace,pointNearPlane,normalNearPlane);
+    
     for(let clippedIndex = 0;clippedIndex<clippedTriangles.length;clippedIndex++){
       
       let triScreenSpace = [];
@@ -458,11 +465,11 @@ function draw() {
   projected_triangles.sort(compareZDepth);
   
   for(let i=0;i<projected_triangles.length;i++){
-   
+    const triColor = 255 * max(projected_triangles[i].shading, 0.15);
     stroke('black')
-    strokeWeight(1)
-    fill(0,0,0,0)
-    fill(255 * max(projected_triangles[i].shading, 0.15));
+    strokeWeight(1);
+    //stroke(triColor) 
+    fill(triColor);
 
 
     // Legenda: [ [point on plane], [normal to plane] ]
