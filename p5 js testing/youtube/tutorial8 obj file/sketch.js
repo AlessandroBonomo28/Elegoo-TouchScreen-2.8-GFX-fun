@@ -416,7 +416,7 @@ function draw() {
     
     // Near plane in front of camera 
     // in order to prevent ZDepth >=1 (objects go behind camera)
-    const pointNearPlane = [0, 0, 2];
+    const pointNearPlane = [0, 0, 0.01];
     const normalNearPlane = [0,0,1];
     let clippedTriangles = clipAgainstPlane(triViewSpace,pointNearPlane,normalNearPlane);
     
