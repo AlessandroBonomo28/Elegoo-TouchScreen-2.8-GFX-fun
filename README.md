@@ -1,8 +1,11 @@
-# Elegoo 2.8 Inch Touch Screen Control Code
+#  Elegoo 2.8 Inch Touch Screen Graphics fun coding
 
-Questo repository contiene il codice necessario per controllare lo shield touchscreen Elegoo 2.8 pollici. Lo shield è compatibile con Arduino. 
+Questo repository contiene il codice necessario per controllare l' **Elegoo 2.8 Inch Touch Screen**. Lo shield è compatibile con Arduino. 
 ## Bonus 3D graphics tutorial
-Nella cartella **p5 js** c'è un tutorial completo su come fare grafica 3D con la libreria processing (javascript, p5.js). L'intento di questo repo è fare il **porting** del codice in javascript in **C++** in modo da **creare un mini-engine 3D** che possa far girare giochi leggeri 3D (ad esempio ELITE) sull'elego touchscreen.
+Nella cartella **p5 js** c'è un tutorial completo su come fare grafica 3D con la libreria processing (javascript, p5.js). L'intento di questo repo è fare il **porting** del codice in javascript in **C++** in modo da **creare un mini-engine 3D** che possa far girare giochi leggeri 3D (ad esempio ELITE) sull'elego touchscreen. **link:** https://youtube.com/playlist?list=PL7X2zBebu0O1vz2MIVOq9uU51wpSyMZCt&si=ZWMFrQ_JF7BRt31-
+
+![3d graphics](https://github.com/AlessandroBonomo28/Elegoo-TouchScreen-2.8-GFX-fun/assets/75626033/665b2770-89f9-49a4-b174-e1463219b3cb)
+
 ## Documentazione
 
 Nella cartella "Elegoo 2.8 Inch Touch Screen User Manual V1.00.2019.12.06" è presente la documentazione ufficiale dello shield. Al suo interno troverai gli esempi forniti da Elegoo, oltre alle librerie necessarie per il corretto funzionamento. È importante includere queste librerie nel tuo progetto Arduino.
